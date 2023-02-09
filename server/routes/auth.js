@@ -3,6 +3,7 @@ import User from '../models/User.js'
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { body, validationResult } from "express-validator"
+import fetchuser from "../middleware/fetchuser.js"
 
 
 const router = express.Router()
@@ -36,7 +37,6 @@ router.post('/createuser',
             }
          }
          const jwtData = jwt.sign(data, JWT_SECRET)
-         //console.log(jwtData)
 
          res.json({ jwtData })
       } catch (error) {
@@ -79,8 +79,20 @@ router.post('/login',
 
       } catch (error) {
          console.log(error.message)
-         res.status(400).send("error")
+         res.status(500).send("error")
       }
    })
+
+router.post('/getuser', fetchuser, async (req, res) => {
+
+   try {
+      let userId = req.user.id
+      let user = User.findById(userId).select("-password")
+      res.send(user)
+   } catch (error) {
+      console.log(error.message)
+      res.status(500).send("error")
+   }
+})
 
 export default router
