@@ -45,4 +45,42 @@ router.post('/createuser',
       }
    })
 
+
+router.post('/login',
+   body("email", "Enter a valid email").isEmail(),
+   body("password", "Enter correct password").isLength({ min: 4 }),
+   async (req, res) => {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+         return res.status(400).json({ errors: "Enter correct email or password" }).status(500)
+      }
+
+      const { email, password } = req.body
+
+      try {
+         let user = await User.findOne({ email })
+         if (!user) {
+            return res.status(400).json({ error: "No user" })
+         }
+
+         const comparePassword = await bcrypt.compare(password, user.password)
+         if (!comparePassword) {
+            return res.status(400).json({ errors: "Try to login with correct password" })
+         }
+
+         const data = {
+            user: {
+               id: user.id
+            }
+         }
+
+         const authToken = jwt.sign(data, JWT_SECRET)
+         res.json({ authToken })
+
+      } catch (error) {
+         console.log(error.message)
+         res.status(400).send("error")
+      }
+   })
+
 export default router
