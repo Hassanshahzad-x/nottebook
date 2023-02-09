@@ -1,6 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 
 const Notes = new Schema({
+   user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref:"user"
+   },
    title: {
       type: String,
       required: true,
@@ -16,11 +20,7 @@ const Notes = new Schema({
    date: {
       type: Date,
       default: Date.now
-   },
-   name: {
-      type: String,
-      required: true
-   },
+   }
 })
 
 export default mongoose.model('Notes', Notes)
