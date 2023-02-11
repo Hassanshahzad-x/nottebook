@@ -19,13 +19,14 @@ const NoteState = (props) => {
    }
 
    const addNote = async (title, description, tag) => {
+      const data = { title, description, tag }
       const response = await fetch(`${host}/api/notes/addnote`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
             'auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNlNTIwMDE2Y2Q2MmVmOGE1NTA1ZTAxIn0sImlhdCI6MTY3NTk2MjE1NX0.yywIJU21KGn0V2ibo6qmKrsqvsiibULmtAGQTFqeQwo"
          },
-         body: JSON.stringify(title, description, tag)
+         body: JSON.stringify(data)
       });
 
       const note = {
@@ -54,28 +55,34 @@ const NoteState = (props) => {
    }
 
    const editNote = async (id, title, description, tag) => {
+      const data = { id, title, description, tag };
       const response = await fetch(`${host}/api/notes/updatenote/${id}`, {
-         method: 'POST',
+         method: 'PUT',
          headers: {
             'Content-Type': 'application/json',
             'auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNlNTIwMDE2Y2Q2MmVmOGE1NTA1ZTAxIn0sImlhdCI6MTY3NTk2MjE1NX0.yywIJU21KGn0V2ibo6qmKrsqvsiibULmtAGQTFqeQwo"
          },
-         body: JSON.stringify(id, title, description, tag)
-      });
-      const json = await response.json();
+         body: JSON.stringify(data)
+      })
 
-      let newNotes = JSON.parse(json.stringify(notes))
-      for (let index = 0; index < notes.length; index++) {
-         const element = notes[index]
-         if (element._id === id) {
-            newNotes[index].title = title
-            newNotes[index].description = description
-            newNotes[index].tag = tag
-            break
+      const json = await response.json()
+      try {
+         let newNotes = JSON.parse(JSON.stringify(notes))
+         for (let index = 0; index < notes.length; index++) {
+            const element = notes[index]
+            if (element._id === id) {
+               newNotes[index].title = title
+               newNotes[index].description = description
+               newNotes[index].tag = tag
+               break
+            }
          }
-
+         setNotes(newNotes)
       }
-      setNotes(newNotes)
+      catch (error) {
+         console.log('Error parsing JSON:', error);
+      }
+
    }
 
    return (
