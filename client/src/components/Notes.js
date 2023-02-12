@@ -2,24 +2,31 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import Note from "./Note"
 import noteContext from '../context/notes/noteContext'
 import AddNote from './AddNote'
+import { useNavigate } from 'react-router-dom'
 
-const Notes = () => {
+const Notes = (props) => {
    const context = useContext(noteContext)
    const { notes, getNotes, editNote } = context
    const ref = useRef(null)
    const refClose = useRef(null)
    const [note, setNote] = useState({ id: "", etitle: "", edescription: "", etag: "" })
+   const history = useNavigate()
 
    const handleClick = (e) => {
       e.preventDefault()
       editNote(note.id, note.etitle, note.edescription, note.etag)
       refClose.current.click()
+      props.showAlert("uploaded successfully", "success")
    }
    const handleChange = (e) => {
       setNote({ ...note, [e.target.name]: e.target.value })
    }
    useEffect(() => {
-      getNotes()
+      if (localStorage.getItem('token')) {
+         getNotes()
+      } else {
+         history('/login')
+      }
       // eslint-disable-next-line
    }, [])
 
@@ -30,7 +37,7 @@ const Notes = () => {
 
    return (
       <div>
-         <AddNote />
+         <AddNote showAlert={props.showAlert} />
          <button ref={ref} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
             Launch demo modal
          </button>

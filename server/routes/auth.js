@@ -15,6 +15,7 @@ router.post('/createuser',
    body("password", "Enter correct password").isLength({ min: 5 })],
    async (req, res) => {
       const error = validationResult(req)
+      let success = false
       if (!error.isEmpty()) {
          return res.status(400).json({ error: error.array() })
       }
@@ -22,6 +23,7 @@ router.post('/createuser',
       try {
          let user = await User.findOne({ email: req.body.email })
          if (user) {
+            success = false
             res.json({ error: "Please enter a unique email", message: error.message })
          }
          const salt = await bcrypt.genSalt(10)
@@ -37,8 +39,8 @@ router.post('/createuser',
             }
          }
          const jwtData = jwt.sign(data, JWT_SECRET)
-
-         res.json({ jwtData })
+         success = true
+         res.json({ success, jwtData })
       } catch (error) {
          console.log(error.message)
          res.status(500).send("ERROR")
