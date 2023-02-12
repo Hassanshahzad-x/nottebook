@@ -51,9 +51,9 @@ router.post('/login',
    body("password", "Enter correct password").isLength({ min: 4 }),
    async (req, res) => {
       const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-         return res.status(400).json({ errors: "Enter correct email or password" }).status(500)
-      }
+      // if (!errors.isEmpty()) {
+      //    return res.status(400).json({ errors: "Enter correct email or password" }).status(500)
+      // }
 
       const { email, password } = req.body
 
